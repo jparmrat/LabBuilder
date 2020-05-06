@@ -23,13 +23,12 @@ New-VMSwitch -Name "InternalNAT" -SwitchType Internal
 $ifindex = get-netadapter |where-object {$_.name -eq "Internal"} | select-object -property ifIndex -expandproperty ifIndex
 New-NetIPAddress -IPAddress 192.168.0.1 -PrefixLength 24 -InterfaceIndex $ifindex
 New-NetNat -Name "InternalNat" -InternalIPInterfaceAddressPrefix 192.168.0.0/24
-Get-VM -All | Set-VMNetworkAdapter InternalNat
 
 #Set VMs to use NAT network
-Set-VMNetworkAdapter -vmname "DC 1" -name "InternalNat"
-Set-VMNetworkAdapter -vmname "IPAM" -name "InternalNat"
-Set-VMNetworkAdapter -vmname "DC 2" -name "InternalNat"
-Set-VMNetworkAdapter -vmname "Client" -name "InternalNat"
+Connect-VMNetworkAdapter -vmname "DC 1" -switchname "InternalNAT"
+Connect-VMNetworkAdapter -vmname "IPAM" -switchname "InternalNAT"
+Connect-VMNetworkAdapter -vmname "DC 2" -switchname "InternalNAT"
+Connect-VMNetworkAdapter -vmname "Client" -switchname "InternalNAT"
 
 #Create firewall rule for ICMP on host machine
 netsh advfirewall firewall add rule name="ICMP Allow incoming V4 echo request" protocol="icmpv4:8,any" dir=in action=allow
